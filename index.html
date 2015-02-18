@@ -12,13 +12,17 @@
             baseUrl: './Scripts'
         });
         require(['app'], 
-            function(app) {});
+            function(app) {
+                (new app()).init($('main'));
+            });
     </script>
 </head>
 <body>
+  <div id="main">
     <input id="input" />
     <button id="calc">Calc</button>
     <div id="dice"></div>
     <div id="options"></div>
+  </div>
 </body>
 </html>
