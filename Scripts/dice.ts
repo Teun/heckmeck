@@ -101,15 +101,23 @@ module Dice {
                     var roll = rolls[i];
                     var picks: DiceSet[] = roll.values.map((v, i) => { return { value: i, nr: v } }).filter(d => d.nr > 0).map(d => {
                         var resultSet = that.AddDice(d.value, d.nr);
+                        resultSet.via = {v:d.value, nr:d.nr};
                         return resultSet;
                     });
                     var pick = picks.sort((d1, d2) => d2.ExpectedValue() - d1.ExpectedValue())[0];
                     valueForRoll += pick.ExpectedValue() * roll.chanceToThrowThis();
+                    var pickedCombi = pick.via.v.toString() + pick.via.nr;
+
+                    if(!this.pickExpectations[pickedCombi]) this.pickExpectations[pickedCombi] = 0;
+                    this.pickExpectations[pickedCombi] += roll.chanceToThrowThis();
                 }
                 this.expected = Math.max(valueForRoll, valueForQuit);
             }
             return this.expected;
         }
+        private pickExpectations : {[combi:string]:number} = { };
+
+        private via = null;
 
         AddDice(value: number, nr: number): DiceSet {
             var values: number[] = Array.apply(this, this.values);

@@ -17,6 +17,8 @@ declare module Dice {
         CurrentValue(): number;
         private expected;
         ExpectedValue(): number;
+        private pickExpectations;
+        private via;
         AddDice(value: number, nr: number): DiceSet;
         DiceLeft(): number;
         static Dead(): DiceSet;
