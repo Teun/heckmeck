@@ -3,6 +3,62 @@
 /// <reference path="dice.ts" />
 import Dice = require("dice");
 import ko = require("knockout");
+import DiceModel = require("dicemodel");
+
+var diceFormat = (d, nr) => {
+    var res = "";
+    for (var j = 0; j < nr; j++) {
+        res += "<img src='img/" + d + ".png' />";
+    }
+    return res;
+};
+
+
+
+class ViewModel{
+    constructor() {
+        this.addPick = (pick) => {
+            var dicelist = this.CurrentSet.dice();
+            var pos = parseInt(pick.roll[1]);
+            dicelist[pos] = parseInt(pick.roll[0]);
+            this.CurrentSet.dice(dicelist);
+        }
+        this.clearAll = ()=>{
+            this.CurrentSet.dice([0,0,0,0,0,0]);
+
+        }
+
+    }
+
+    CurrentSet : DiceModel.Set;
+    fmt = {
+        chance:function(exp){
+            return (exp *100).toFixed(3) + "%";
+        },
+        improvement:function(old, newVal){
+            var value :number= (newVal-old);
+            var result = "<span class=\"" + ((value >= 0) ? "great" : "meh") + "\">" + 
+                ((value >= 0) ? "+" :"") +
+                value.toFixed(3) + "</span>";
+            return result;
+        },
+        imgPick:function(pickExpr){
+            if(pickExpr == "d")return "----";
+            if(pickExpr.length != 2)throw "Not a valid format: " + pickExpr;
+            return diceFormat(parseInt(pickExpr[1]) +1, parseInt(pickExpr[0]));
+        },
+        imgRoll:function(r){
+            var html = "";
+            for (var i = 0; i < r.length; i++){
+                html += diceFormat(i+1, r[i]);
+
+            }
+            return html;
+        }
+    };
+    addPick : (pick)=>void;
+    clearAll : ()=>void;
+}
 
 class app{
     private dice = (d, nr) => {
@@ -25,42 +81,11 @@ class app{
         return 4;
     }
     init(cont){
-    var self = this;
-        $('#calc').on("click", function () {
-            var set = $("#input").val();
-            var setList = [];
-            var html = "";
-            for (var i = 0; i < set.length; i++) {
-                var cnt = parseInt(set[i]);
-                setList.push(cnt);
-                html += self.dice(i + 1, cnt);
-            }
-            $("#dice").html(html);
+        var self = this;
+        var viewModel = new ViewModel();
+        viewModel.CurrentSet = new DiceModel.Set("000000");
+        ko.applyBindings(viewModel, cont);
 
-            var ds: Dice.DiceSet = Dice.DiceSet.For(setList);
-            var html = "";
-            html += "<table><tr><td>Expected</td><td></td></tr>"
-            html += "<tr><td>" + ds.CurrentValue() + "</td><td>Stop now</td></tr>"
-            html += "<tr><td>" + ds.ExpectedValue() + "</td><td>Optimal play</td></tr>"
-            var cnt = 0;
-            for (var i = 0; i < set.length; i++) {
-                cnt += parseInt(set[i]);
-            }
-            var diceLeft = 8 - cnt;
-            for (var i = 0; i < setList.length; i++) {
-                if (setList[i] == 0) {
-                    for (var j = 0; j < diceLeft; j++) {
-                        var newSet =Dice.DiceSet.For( setList.slice(0, i).concat(j + 1).concat(setList.slice(i + 1)));
-                        html += "<tr><td>" + newSet.ExpectedValue() + "</td><td>" + self.dice(i + 1, j + 1) + "</td></tr>";
-                    }
-                }
-            }
-            html += "</table>"
-
-            $("#options").html(html);
-
-
-        });
     }
 }
 export = app;

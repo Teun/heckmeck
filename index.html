@@ -4,25 +4,89 @@
 <head>
     <meta charset="utf-8" />
     <title>TypeScript HTML App</title>
-    <link rel="stylesheet" href="app.css" type="text/css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.js"></script>
-    <script src="./Scripts/require.js"></script>
+    <!-- Bootstrap -->
+    <link href="Content/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->    <link rel="stylesheet" href="app.css" type="text/css" />
+    <script src="Scripts/jquery-1.9.1.min.js"></script>
+    <script src="Scripts/knockout.js"></script>
+    <script src="Scripts/Bootstrap.min.js"></script>
+    <script src="Scripts/require.js"></script>
     <script>
         require.config({
             baseUrl: './Scripts'
-        });
+            });
         require(['app'], 
             function(app) {
-                (new app()).init($('main'));
+                (new app()).init($('#komain')[0]);
             });
     </script>
 </head>
 <body>
-  <div id="main">
-    <input id="input" />
-    <button id="calc">Calc</button>
-    <div id="dice"></div>
-    <div id="options"></div>
-  </div>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Heckmeck am Bratwurmeck</a>
+        </div>
+      </div>
+    </nav>
+
+    <div id="komain" class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h2>Optimal play in Heckmeck am Bratwurmeck</h2>
+          <p> </p>
+        </div>
+    </div>
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="col-md-4">
+            <div data-bind="visible: CurrentSet.expectation().DiceLeft() == 8">
+                No dice picked yet.
+            </div>
+            <div style="display:none" data-bind="visible: CurrentSet.expectation().DiceLeft() < 8">
+                <a class="btn btn-default" href="#" role="button" data-bind="click:clearAll">Clear</a>
+            </div>
+            <div id="currentRoll" data-bind="html:$root.fmt.imgRoll(CurrentSet.dice())">
+            </div>
+
+
+        </div>
+        <div class="col-md-8">
+          <div id="expectations" data-bind="with:CurrentSet.expectation">
+            <div>If you play optimal from now on, you expect: <span data-bind="text:ExpectedValue().toFixed(3)"></span></div>
+            <div>If you quit now, you have: <span data-bind="text:CurrentValue()"></span></div>
+            <div style="display:none"  data-bind="visible: ExpectedValue() > CurrentValue()" >Throw again!</div>
+            <div style="display:none"  data-bind="visible: ExpectedValue() <= CurrentValue()" >Quit now!</div>
+            <table>
+                <thead>
+                    <th data-bind="click:function(d,e){sortOrder('chance')}">probability</th>
+                    <th data-bind="click:function(d,e){sortOrder('value')}">value</th>
+                    <th> </th>      
+                </thead>
+              <tbody data-bind="foreach:PickExpectations()">
+                <tr>
+                  <td data-bind="text:$root.fmt.chance($data.chance)"></td>
+                  <td data-bind="html:$root.fmt.improvement($root.CurrentSet.expectation().ExpectedValue(), $data.value)"></td>
+                  <td data-bind="click: $root.addPick  , html:$root.fmt.imgPick($data.roll)"></td>
+                </tr> 
+              </tbody>  
+            </table>    
+
+          </div>   
+       </div>
+      <hr>
+
+      <footer>
+        <p>&copy; Teun Duynstee 2015</p>
+      </footer>
+    </div> <!-- /container -->
+
 </body>
 </html>

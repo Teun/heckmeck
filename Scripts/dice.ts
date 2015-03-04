@@ -1,4 +1,6 @@
-﻿export = Dice;
+﻿/// <reference path="knockout.d.ts" />
+import ko = require("knockout");
+export = Dice;
 module Dice {
     export class Roll {
 
@@ -62,6 +64,8 @@ module Dice {
 
     var cache: { [key: string]: DiceSet; } = {};
 
+    interface RollStats {chance:number; value:number;}
+
     export class DiceSet extends Roll {
         constructor(nums: number[]) {
             super(nums);
@@ -106,16 +110,26 @@ module Dice {
                     });
                     var pick = picks.sort((d1, d2) => d2.ExpectedValue() - d1.ExpectedValue())[0];
                     valueForRoll += pick.ExpectedValue() * roll.chanceToThrowThis();
-                    var pickedCombi = pick.via.v.toString() + pick.via.nr;
-
-                    if(!this.pickExpectations[pickedCombi]) this.pickExpectations[pickedCombi] = 0;
-                    this.pickExpectations[pickedCombi] += roll.chanceToThrowThis();
+                    
+                    var pickedCombi : string=  pick.via.nr + pick.via.v.toString();
+                    if(pick.ExpectedValue() == 0) pickedCombi = "d";
+                    if(!this.pickExpectations[pickedCombi]) this.pickExpectations[pickedCombi] = {chance: 0, value: pick.ExpectedValue()};
+                    this.pickExpectations[pickedCombi].chance += roll.chanceToThrowThis();
                 }
                 this.expected = Math.max(valueForRoll, valueForQuit);
             }
             return this.expected;
         }
-        private pickExpectations : {[combi:string]:number} = { };
+        private pickExpectations : {[combi:string]:RollStats} = { };
+        public sortOrder : KnockoutObservable<string> = ko.observable("chance");
+
+        public PickExpectations (){
+            var result = [];
+            for(var key in this.pickExpectations){
+                result.push({roll:key, chance: this.pickExpectations[key].chance, value: this.pickExpectations[key].value});
+            }
+            return result.sort((p1,p2)=>p2[this.sortOrder()] - p1[this.sortOrder()]);
+        }
 
         private via = null;
 

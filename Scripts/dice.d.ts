@@ -1,3 +1,4 @@
+/// <reference path="knockout.d.ts" />
 export = Dice;
 declare module Dice {
     class Roll {
@@ -18,6 +19,8 @@ declare module Dice {
         private expected;
         ExpectedValue(): number;
         private pickExpectations;
+        sortOrder: KnockoutObservable<string>;
+        PickExpectations(): any[];
         private via;
         AddDice(value: number, nr: number): DiceSet;
         DiceLeft(): number;

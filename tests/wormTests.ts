@@ -51,4 +51,10 @@ export module WormTests {
             this.areIdentical(1.6447296740400994, ds.ExpectedValue());
         }
     }
+    export class ExpectedPicks extends tsUnit.TestClass {
+        oneDiceGivesOneSixthForWorm() {
+            var ds = new Dice.DiceSet([3, 0, 2, 0, 2, 0]);
+            var expectedValue = ds.ExpectedValue(); 
+        }
+    }
 } 
