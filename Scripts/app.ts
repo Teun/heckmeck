@@ -5,10 +5,11 @@ import Dice = require("dice");
 import ko = require("knockout");
 import DiceModel = require("dicemodel");
 
+var imgBase = "img/";
 var diceFormat = (d, nr) => {
     var res = "";
     for (var j = 0; j < nr; j++) {
-        res += "<img src='img/" + d + ".png' />";
+        res += "<img src='" + imgBase + d + ".png' />";
     }
     return res;
 };
@@ -43,7 +44,7 @@ class ViewModel{
             return result;
         },
         imgPick:function(pickExpr){
-            if(pickExpr == "d")return "----";
+            if(pickExpr == "d")return "<img src='" + imgBase + "dead.png' />";
             if(pickExpr.length != 2)throw "Not a valid format: " + pickExpr;
             return diceFormat(parseInt(pickExpr[1]) +1, parseInt(pickExpr[0]));
         },
@@ -61,12 +62,8 @@ class ViewModel{
 }
 
 class app{
-    private dice = (d, nr) => {
-        var res = "";
-        for (var j = 0; j < nr; j++) {
-            res += "<img src='img/" + d + ".png' />";
-        }
-        return res;
+    constructor(ib) {
+        if(ib)imgBase = ib;
     }
     private currentValue = (set) => {
         var res = 0;

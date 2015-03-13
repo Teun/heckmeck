@@ -2,7 +2,7 @@
 /// <reference path="knockout.d.ts" />
 /// <reference path="dice.d.ts" />
 declare class app {
-    private dice;
+    constructor(ib: any);
     private currentValue;
     init(cont: any): void;
 }

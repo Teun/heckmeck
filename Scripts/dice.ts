@@ -122,7 +122,7 @@ module Dice {
         }
         private pickExpectations : {[combi:string]:RollStats} = { };
         public sortOrder : KnockoutObservable<string> = ko.observable("chance");
-
+ 
         public PickExpectations (){
             var result = [];
             for(var key in this.pickExpectations){
